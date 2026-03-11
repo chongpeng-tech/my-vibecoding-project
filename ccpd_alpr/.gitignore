@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+
+data/
+data_smoke/
+data_smoke2/
+runs/
+detector/
+
+*.pt

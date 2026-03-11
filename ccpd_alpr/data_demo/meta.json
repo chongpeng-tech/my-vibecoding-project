@@ -1,0 +1,15 @@
+{
+  "dataset_root": "F:/ccpd_b",
+  "output_root": "F:/Code/my-vibecoding-project/ccpd_alpr/data_demo",
+  "num_samples": 15000,
+  "image_size": [
+    720,
+    1160
+  ],
+  "splits": {
+    "train": 13500,
+    "val": 750,
+    "test": 750
+  },
+  "seed": 3407
+}
