@@ -1,0 +1,11 @@
+src\Text\Number.java:1:	PackageCase:	Package name contains upper case characters
+src\Text\Number.java:2:	CommentRequired:	Class comments are required
+src\Text\Number.java:2:	AtLeastOneConstructor:	Each class should declare at least one constructor
+src\Text\Number.java:3:	CommentRequired:	Public method and constructor comments are required
+src\Text\Number.java:3:	UseVarargs:	Consider using varargs for methods or constructors which take an array the last parameter.
+src\Text\Number.java:3:	ShortVariable:	Avoid variables with short names like a
+src\Text\Number.java:3:	MethodArgumentCouldBeFinal:	Parameter 'a' is not assigned and could be declared final
+src\Text\Number.java:5:	ControlStatementBraces:	This statement should have braces
+src\Text\Number.java:6:	ControlStatementBraces:	This statement should have braces
+src\Text\Number.java:8:	ControlStatementBraces:	This statement should have braces
+src\Text\Number.java:9:	ControlStatementBraces:	This statement should have braces

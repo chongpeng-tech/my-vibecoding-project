@@ -1,0 +1,30 @@
+﻿{% extends "base.html" %}
+{% block title %}登录 - Nebula Journal{% endblock %}
+{% block body_class %}login-body{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+  <div class="auth-card">
+    <p class="eyebrow">Secure Access</p>
+    <h1>登录你的极客空间</h1>
+    <p class="auth-tip">登录后可写技术笔记，并像 LeetCode 一样在线运行 Python / C++。</p>
+
+    <form method="post" class="auth-form">
+      <label for="username">用户名</label>
+      <input id="username" name="username" type="text" required autocomplete="username">
+
+      <label for="password">密码</label>
+      <input id="password" name="password" type="password" required autocomplete="current-password">
+
+      <button type="submit">进入工作台</button>
+    </form>
+
+    {% if registration_enabled %}
+      <p class="auth-foot">
+        还没有账号？
+        <a href="{{ url_for('register') }}">去注册</a>
+      </p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

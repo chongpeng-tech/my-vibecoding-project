@@ -1,0 +1,53 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Nebula Journal{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='20260408a') }}">
+    {% block head_extra %}{% endblock %}
+  </head>
+  <body class="{% block body_class %}{{ body_class|default('') }}{% endblock %}">
+    <div class="ambient-glow"></div>
+
+    {% if session.get("logged_in") %}
+      <header class="app-nav">
+        <a class="brand" href="{{ url_for('workspace') }}">
+          <span class="brand-dot"></span>
+          <span>Nebula Journal</span>
+        </a>
+
+        <nav>
+          <a href="{{ url_for('workspace') }}" class="{% if active_page == 'workspace' %}is-active{% endif %}">工作台</a>
+          <a href="{{ url_for('diary_home') }}" class="{% if active_page == 'diary' %}is-active{% endif %}">知识库</a>
+          <a href="{{ url_for('playground') }}" class="{% if active_page == 'playground' %}is-active{% endif %}">开发面板</a>
+          {% if session.get("is_admin") %}
+            <a href="{{ url_for('admin_panel') }}" class="{% if active_page == 'admin' %}is-active{% endif %}">管理后台</a>
+          {% endif %}
+        </nav>
+
+        <span class="nav-user">{{ session.get("username") }}</span>
+
+        <form method="post" action="{{ url_for('logout') }}">
+          <button type="submit" class="ghost-btn">退出登录</button>
+        </form>
+      </header>
+    {% endif %}
+
+    <main class="page-shell {{ page_class|default('') }}">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <section class="flash-list">
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          </section>
+        {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </main>
+
+    {% block body_extra %}{% endblock %}
+  </body>
+</html>

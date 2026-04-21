@@ -1,0 +1,8 @@
+Found a 3 line (35 tokens) duplication in the following files: 
+Starting at line 5 of F:\Code\my-vibecoding-project\pmd_static_test_report\workspace\demoPMD\src\Text\Number.java
+Starting at line 8 of F:\Code\my-vibecoding-project\pmd_static_test_report\workspace\demoPMD\src\Text\Number.java
+
+        for(int row = 0;row < 100;row++)
+            for(int col = 0;col < 5;col++)
+                sum = sum + a[row][col];
+

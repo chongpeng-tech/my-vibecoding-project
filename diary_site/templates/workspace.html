@@ -1,0 +1,24 @@
+﻿{% extends "base.html" %}
+{% block title %}工作台 - Nebula Journal{% endblock %}
+
+{% block content %}
+<section class="panel workspace-hero">
+  <p class="eyebrow">Workspace</p>
+  <h1>欢迎回来，继续你的极客创作</h1>
+  <p class="meta">你可以先写技术笔记，再进入开发面板运行 Python / C++ 代码。</p>
+</section>
+
+<section class="workspace-grid">
+  <article class="panel workspace-card">
+    <h2>技术知识库</h2>
+    <p>支持 Markdown、LaTeX 公式、标签检索与代码块复制。</p>
+    <a href="{{ url_for('diary_home') }}" class="primary-link">进入知识库</a>
+  </article>
+
+  <article class="panel workspace-card">
+    <h2>专业开发面板</h2>
+    <p>Monaco 编辑器 + 交互终端 + Conda 环境切换，像轻量在线 IDE 一样写代码。</p>
+    <a href="{{ url_for('playground') }}" class="primary-link">进入开发面板</a>
+  </article>
+</section>
+{% endblock %}

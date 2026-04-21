@@ -1,0 +1,44 @@
+﻿{% extends "base.html" %}
+{% block title %}Piggy Neon Portal{% endblock %}
+{% block body_class %}landing-body{% endblock %}
+
+{% block content %}
+<section class="landing-top-links">
+  <a class="jump-btn primary" href="{{ url_for('workspace') if session.get('logged_in') else url_for('login') }}">进入系统</a>
+  <a class="jump-btn" href="{{ url_for('diary_home') if session.get('logged_in') else url_for('login') }}">去写知识库</a>
+  <a class="jump-btn" href="{{ url_for('playground') if session.get('logged_in') else url_for('login') }}">去写代码</a>
+  {% if not session.get('logged_in') and registration_enabled %}
+    <a class="jump-btn accent" href="{{ url_for('register') }}">注册账号</a>
+  {% endif %}
+</section>
+
+<section class="panel pig-hero">
+  <div class="pig-hero-grid">
+    <div class="pig-copy">
+      <p class="eyebrow">Cyber Cute Mode</p>
+      <h1>赛博小猪乐园已上线</h1>
+      <p class="hero-subtitle">
+        这里是你的个人极客基地。主页保持简洁，只保留顶部导航入口，
+        一键跳转到知识库和在线 IDE。右侧放置了 pignic 与一二布布的静态可爱图片。
+      </p>
+      <p class="pig-caption">Signal Stable · Piggies Online · Keep Coding</p>
+    </div>
+
+    <div class="cute-wall" aria-hidden="true">
+      <figure class="cute-card large">
+        <img src="{{ url_for('static', filename='images/cute/pignic_icon.png') }}" alt="Pignic 小猪头像">
+      </figure>
+      <figure class="cute-card">
+        <img src="{{ url_for('static', filename='images/cute/bubu_cover.webp') }}" alt="一二布布封面">
+      </figure>
+      <figure class="cute-card">
+        <img src="{{ url_for('static', filename='images/cute/bubu_0.webp') }}" alt="一二布布贴纸 1">
+      </figure>
+      <figure class="cute-card">
+        <img src="{{ url_for('static', filename='images/cute/bubu_10.webp') }}" alt="一二布布贴纸 2">
+      </figure>
+    </div>
+  </div>
+  <p class="source-note">素材来源：公开静态图片（非动图），优化了加载稳定性。</p>
+</section>
+{% endblock %}

@@ -1,0 +1,28 @@
+﻿{% extends "base.html" %}
+{% block title %}编辑笔记 - Nebula Journal{% endblock %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-head split">
+    <div>
+      <p class="eyebrow">Knowledge Base</p>
+      <h1>编辑笔记</h1>
+      <p class="meta">内容支持 Markdown / LaTeX，标签用逗号分隔。</p>
+    </div>
+    <a class="subtle-link" href="{{ url_for('diary_home') }}">返回知识库</a>
+  </div>
+
+  <form method="post" class="diary-form">
+    <label for="title">标题</label>
+    <input id="title" name="title" type="text" maxlength="120" value="{{ entry.title }}" required>
+
+    <label for="tags">标签（逗号分隔）</label>
+    <input id="tags" name="tags" type="text" maxlength="200" value="{{ entry.tags_input }}" placeholder="算法, HomeLab, C++">
+
+    <label for="content">内容（Markdown）</label>
+    <textarea id="content" name="content" rows="12" required>{{ entry.content }}</textarea>
+
+    <button type="submit">保存修改</button>
+  </form>
+</section>
+{% endblock %}

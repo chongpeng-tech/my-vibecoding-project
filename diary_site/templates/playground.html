@@ -1,0 +1,193 @@
+﻿{% extends "base.html" %}
+{% block title %}在线 IDE Pro - Nebula Journal{% endblock %}
+
+{% block content %}
+<section class="panel ide-shell ide-pro-shell">
+  <div class="ide-toolbar">
+    <div class="ide-toolbar-left">
+      <div class="lang-tabs">
+        <button type="button" class="lang-tab is-active" data-lang="python">Python</button>
+        <button type="button" class="lang-tab" data-lang="cpp">C++</button>
+      </div>
+
+      <label class="tiny-label inline" for="runtime-env-select">运行环境</label>
+      <select id="runtime-env-select" class="env-select">
+        {% for env in runtime_envs %}
+          <option value="{{ env.id }}" {% if env.id == current_runtime_env %}selected{% endif %}>{{ env.label }}</option>
+        {% endfor %}
+      </select>
+      <button id="refresh-env-btn" type="button" class="ghost-btn">刷新环境</button>
+      <button id="toggle-command-btn" type="button" class="ghost-btn">命令面板</button>
+      <button id="toggle-quickopen-btn" type="button" class="ghost-btn">快速打开</button>
+      <button id="toggle-search-btn" type="button" class="ghost-btn">全局搜索</button>
+      <button id="toggle-git-btn" type="button" class="ghost-btn">Source Control</button>
+    </div>
+
+    <div class="ide-toolbar-right">
+      <button id="new-file-btn" type="button" class="ghost-btn">新建文件</button>
+      <button id="new-folder-btn" type="button" class="ghost-btn">新建目录</button>
+      <button id="rename-item-btn" type="button" class="ghost-btn">重命名</button>
+      <button id="delete-item-btn" type="button" class="ghost-btn">删除</button>
+      <button id="save-btn" type="button" class="ghost-btn">保存</button>
+      <button id="run-btn" type="button">运行代码</button>
+      <button id="terminal-start-btn" type="button" class="ghost-btn">代码终端</button>
+      <button id="shell-start-btn" type="button" class="ghost-btn">Shell</button>
+      <button id="terminal-stop-btn" type="button" class="ghost-btn">停止终端</button>
+    </div>
+  </div>
+
+  <div class="ide-grid ide-grid-pro">
+    <aside class="ide-sidebar">
+      <div class="ide-sidebar-head">
+        <h2>Explorer</h2>
+        <span id="file-count" class="meta">0 文件</span>
+      </div>
+
+      <div class="ide-pathbar">
+        <label class="tiny-label" for="cwd-input">当前目录</label>
+        <input id="cwd-input" type="text" spellcheck="false" value="{{ ide_cwd }}">
+        <div class="ide-path-actions">
+          <button id="open-dir-btn" type="button" class="ghost-btn mini">打开目录</button>
+          <button id="up-dir-btn" type="button" class="ghost-btn mini">上级目录</button>
+          <button id="home-dir-btn" type="button" class="ghost-btn mini">回到主页目录</button>
+        </div>
+        <p id="cwd-tip" class="meta">
+          {% if ide_can_browse_any %}
+            管理员模式：可打开服务器可访问目录。
+          {% else %}
+            普通用户模式：仅可访问你的个人工作区目录。
+          {% endif %}
+        </p>
+      </div>
+
+      <ul id="file-list" class="file-list"></ul>
+
+      <section class="server-status-card">
+        <div class="server-status-head">
+          <h3>服务器状态</h3>
+          <button id="refresh-status-btn" type="button" class="ghost-btn mini">刷新</button>
+        </div>
+        <ul class="server-status-grid">
+          <li><span class="server-status-label">CPU 负载</span><strong id="cpu-load" class="server-status-value">--</strong></li>
+          <li><span class="server-status-label">内存占用</span><strong id="mem-used" class="server-status-value">--</strong></li>
+          <li><span class="server-status-label">内存总量</span><strong id="mem-total" class="server-status-value">--</strong></li>
+          <li><span class="server-status-label">磁盘占用</span><strong id="disk-used" class="server-status-value">--</strong></li>
+          <li><span class="server-status-label">磁盘总量</span><strong id="disk-total" class="server-status-value">--</strong></li>
+          <li><span class="server-status-label">磁盘路径</span><strong id="disk-path" class="server-status-value">--</strong></li>
+        </ul>
+        <p id="status-time" class="meta">--</p>
+        <p id="status-error" class="meta server-status-error"></p>
+      </section>
+    </aside>
+
+    <section class="ide-main ide-main-pro">
+      <div id="editor-tabs" class="editor-tabs"></div>
+
+      <div class="ide-current-file">
+        <strong id="current-file-name">未选择文件</strong>
+        <span id="save-state" class="meta">已保存</span>
+      </div>
+
+      <div id="code-editor" class="code-editor-host"></div>
+      <textarea id="code-editor-fallback" class="code-editor-fallback" spellcheck="false" aria-label="Code editor fallback"></textarea>
+
+      <div class="io-grid ide-io-grid">
+        <div>
+          <label class="tiny-label" for="stdin-box">标准输入 stdin</label>
+          <textarea id="stdin-box" spellcheck="false" placeholder="可选：输入测试数据"></textarea>
+        </div>
+        <div>
+          <label class="tiny-label" for="expected-box">期望输出（可选）</label>
+          <textarea id="expected-box" spellcheck="false" placeholder="可选：用于自动比对"></textarea>
+        </div>
+      </div>
+
+      <div class="ide-panel-grid">
+        <article class="result-card">
+          <div class="result-head">
+            <h2>运行结果</h2>
+            <span id="verdict-badge" class="verdict waiting">Waiting</span>
+          </div>
+          <pre id="stdout-view" class="stdout-view">点击“运行代码”开始执行</pre>
+          <pre id="stderr-view" class="stderr-view"></pre>
+        </article>
+
+        <article id="search-panel" class="result-card ide-side-panel is-hidden">
+          <div class="result-head">
+            <h2>全局搜索</h2>
+          </div>
+          <div class="search-bar-row">
+            <input id="search-input" type="text" placeholder="输入关键字（>=2）">
+            <button id="search-btn" type="button" class="ghost-btn">搜索</button>
+          </div>
+          <ul id="search-results" class="search-results"></ul>
+        </article>
+
+        <article id="git-panel" class="result-card ide-side-panel is-hidden">
+          <div class="result-head">
+            <h2>Source Control</h2>
+            <button id="git-refresh-btn" type="button" class="ghost-btn mini">刷新</button>
+          </div>
+          <p id="git-branch" class="meta">Branch: --</p>
+          <ul id="git-status-list" class="search-results"></ul>
+          <label class="tiny-label" for="git-commit-message">Commit message</label>
+          <input id="git-commit-message" type="text" maxlength="200" placeholder="例如: feat: improve IDE panel">
+          <button id="git-commit-btn" type="button" class="ghost-btn">提交（add -A）</button>
+          <label class="tiny-label" for="git-diff-view">Diff</label>
+          <pre id="git-diff-view" class="stdout-view">选择变更文件可查看 diff</pre>
+        </article>
+      </div>
+
+      <article class="result-card terminal-card">
+        <div class="result-head">
+          <h2>交互终端</h2>
+          <span id="terminal-state" class="verdict waiting">Idle</span>
+        </div>
+        <pre id="terminal-output" class="stdout-view terminal-output">点击“代码终端”或“Shell”启动终端</pre>
+        <div class="terminal-input-row">
+          <input id="terminal-input" type="text" spellcheck="false" placeholder="输入后回车或点击发送（自动补换行）">
+          <button id="terminal-send-btn" type="button" class="ghost-btn">发送</button>
+        </div>
+      </article>
+
+      <p class="meta warning">
+        快捷键：Ctrl+S 保存，Ctrl+P 快速打开，Ctrl+Shift+P 命令面板，Ctrl+Shift+F 全局搜索，F9 运行。
+      </p>
+    </section>
+  </div>
+</section>
+
+<div id="command-palette" class="ide-overlay is-hidden" role="dialog" aria-modal="true">
+  <div class="ide-overlay-card">
+    <input id="command-input" type="text" placeholder="输入命令，例如：save / run / quick open / git refresh">
+    <ul id="command-list" class="search-results"></ul>
+  </div>
+</div>
+
+<div id="quick-open" class="ide-overlay is-hidden" role="dialog" aria-modal="true">
+  <div class="ide-overlay-card">
+    <input id="quick-open-input" type="text" placeholder="输入文件名快速打开（Ctrl+P）">
+    <ul id="quick-open-list" class="search-results"></ul>
+  </div>
+</div>
+{% endblock %}
+
+{% block body_extra %}
+<script>
+  window.IDE_BOOTSTRAP = {
+    runtimeEnvs: {{ runtime_envs|tojson }},
+    currentRuntimeEnv: {{ current_runtime_env|tojson }},
+    initialDir: {{ ide_cwd|tojson }},
+    rootDir: {{ ide_root|tojson }},
+    homeDir: {{ ide_home|tojson }},
+    canBrowseAny: {{ ide_can_browse_any|tojson }},
+    limits: {
+      maxCodeChars: {{ max_code_chars }},
+      maxStdinChars: {{ max_stdin_chars }},
+      maxFileChars: {{ max_file_chars }}
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
+<script src="{{ url_for('static', filename='playground.js', v='20260408a') }}"></script>
+{% endblock %}

@@ -1,0 +1,36 @@
+﻿{% extends "base.html" %}
+{% block title %}注册 - Nebula Journal{% endblock %}
+{% block body_class %}login-body{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+  <div class="auth-card">
+    <p class="eyebrow">Create Account</p>
+    <h1>注册新账号</h1>
+    <p class="auth-tip">使用邀请码注册，密码需要足够复杂，防止被滥用。</p>
+
+    <form method="post" class="auth-form">
+      <label for="username">用户名</label>
+      <input id="username" name="username" type="text" minlength="3" maxlength="24" required autocomplete="username">
+
+      <label for="password">密码</label>
+      <input id="password" name="password" type="password" minlength="10" required autocomplete="new-password">
+
+      <label for="confirm_password">确认密码</label>
+      <input id="confirm_password" name="confirm_password" type="password" minlength="10" required autocomplete="new-password">
+
+      <label for="invite_code">邀请码</label>
+      <input id="invite_code" name="invite_code" type="password" required autocomplete="off">
+
+      <input class="honeypot" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+      <button type="submit">创建账号</button>
+    </form>
+
+    <p class="auth-foot">
+      已有账号？
+      <a href="{{ url_for('login') }}">返回登录</a>
+    </p>
+  </div>
+</section>
+{% endblock %}

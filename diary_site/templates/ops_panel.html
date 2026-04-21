@@ -1,0 +1,46 @@
+﻿{% extends "base.html" %}
+{% block title %}隐藏服务器看板 - Nebula Journal{% endblock %}
+
+{% block content %}
+<section class="panel ops-hero">
+  <p class="eyebrow">Hidden Ops</p>
+  <h1>服务器实时看板</h1>
+  <p class="meta">仅管理员可见。每 3 秒自动刷新一次 CPU、内存、磁盘状态。</p>
+</section>
+
+<section class="ops-grid">
+  <article class="panel ops-card">
+    <h2>CPU 负载</h2>
+    <p id="cpu-value" class="ops-value">--</p>
+    <div class="ops-meter"><span id="cpu-bar"></span></div>
+    <p id="cpu-load-line" class="meta">--</p>
+  </article>
+
+  <article class="panel ops-card">
+    <h2>内存占用</h2>
+    <p id="mem-value" class="ops-value">--</p>
+    <div class="ops-meter"><span id="mem-bar"></span></div>
+    <p id="mem-line" class="meta">--</p>
+  </article>
+
+  <article class="panel ops-card">
+    <h2>磁盘占用</h2>
+    <p id="disk-value" class="ops-value">--</p>
+    <div class="ops-meter"><span id="disk-bar"></span></div>
+    <p id="disk-line" class="meta">--</p>
+  </article>
+</section>
+
+<section class="panel ops-log">
+  <div class="panel-head split">
+    <h2>状态日志</h2>
+    <span id="ops-time" class="meta">--</span>
+  </div>
+  <p id="ops-error" class="meta server-status-error"></p>
+  <ul id="ops-history" class="ops-history"></ul>
+</section>
+{% endblock %}
+
+{% block body_extra %}
+<script src="{{ url_for('static', filename='ops_panel.js') }}"></script>
+{% endblock %}

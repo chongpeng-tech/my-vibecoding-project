@@ -1,0 +1,92 @@
+﻿{% extends "base.html" %}
+{% block title %}技术知识库 - Nebula Journal{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+{% endblock %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-head">
+    <div>
+      <p class="eyebrow">Knowledge Base</p>
+      <h1>记录技术笔记与推导</h1>
+      <p class="meta">支持 Markdown、代码块复制、LaTeX 公式和标签检索。</p>
+    </div>
+  </div>
+
+  <form method="post" action="{{ url_for('create_entry') }}" class="diary-form">
+    <label for="title">标题</label>
+    <input id="title" name="title" type="text" maxlength="120" required>
+
+    <label for="tags">标签（逗号分隔）</label>
+    <input id="tags" name="tags" type="text" maxlength="200" placeholder="算法, HomeLab, C++">
+
+    <label for="content">内容（Markdown）</label>
+    <textarea id="content" name="content" rows="8" required placeholder="# 今日总结\n\n- 学习了 ...\n\n$$O(n \log n)$$"></textarea>
+
+    <button type="submit">保存笔记</button>
+  </form>
+</section>
+
+<section class="panel kb-filter-panel">
+  <div class="panel-head split">
+    <h2>标签检索</h2>
+    {% if active_tag %}
+      <a class="subtle-link" href="{{ url_for('diary_home') }}">清除筛选</a>
+    {% endif %}
+  </div>
+  <div class="tag-list">
+    <a class="tag-chip {% if not active_tag %}is-active{% endif %}" href="{{ url_for('diary_home') }}">全部</a>
+    {% for tag in all_tags %}
+      <a class="tag-chip {% if active_tag and active_tag|lower == tag.name|lower %}is-active{% endif %}" href="{{ url_for('diary_home', tag=tag.name) }}">
+        {{ tag.name }}
+        <span>{{ tag.usage_count }}</span>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="diary-list">
+  {% if entries %}
+    {% for entry in entries %}
+      <article class="panel diary-entry">
+        <header>
+          <h2>{{ entry.title }}</h2>
+          <p class="meta">创建 {{ entry.created_at }} · 更新 {{ entry.updated_at }}</p>
+          <div class="tag-list">
+            {% if entry.tags %}
+              {% for tag in entry.tags %}
+                <a class="tag-chip mini {% if active_tag and active_tag|lower == tag|lower %}is-active{% endif %}" href="{{ url_for('diary_home', tag=tag) }}">{{ tag }}</a>
+              {% endfor %}
+            {% else %}
+              <span class="meta">无标签</span>
+            {% endif %}
+          </div>
+        </header>
+
+        <textarea class="md-source" hidden>{{ entry.content }}</textarea>
+        <div class="markdown-body js-markdown-render">正在渲染 Markdown...</div>
+
+        <div class="entry-actions">
+          <a href="{{ url_for('edit_entry', entry_id=entry.id) }}" class="subtle-link">编辑</a>
+          <form method="post" action="{{ url_for('delete_entry', entry_id=entry.id) }}" onsubmit="return confirm('确认删除这条笔记吗？');">
+            <button type="submit" class="danger-btn">删除</button>
+          </form>
+        </div>
+      </article>
+    {% endfor %}
+  {% else %}
+    <article class="panel">
+      <p class="meta">还没有内容，写下第一条技术笔记吧。</p>
+    </article>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block body_extra %}
+<script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-katex@2.0.5/dist/markdown-it-katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js"></script>
+<script src="{{ url_for('static', filename='diary.js') }}"></script>
+{% endblock %}

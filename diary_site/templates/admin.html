@@ -1,0 +1,106 @@
+﻿{% extends "base.html" %}
+{% block title %}管理员后台 - Nebula Journal{% endblock %}
+
+{% block content %}
+<section class="panel admin-hero">
+  <div class="panel-head split">
+    <div>
+      <p class="eyebrow">Admin Console</p>
+      <h1>管理员后台</h1>
+      <p class="meta">管理用户状态、解锁账户、重置临时密码。</p>
+    </div>
+    <a class="subtle-link" href="{{ url_for('ops_pulse') }}">隐藏服务器看板</a>
+  </div>
+</section>
+
+<section class="admin-stats">
+  <article class="panel admin-stat">
+    <p class="tiny-label">总用户</p>
+    <h2>{{ stats.total_users }}</h2>
+  </article>
+  <article class="panel admin-stat">
+    <p class="tiny-label">启用中</p>
+    <h2>{{ stats.active_users }}</h2>
+  </article>
+  <article class="panel admin-stat">
+    <p class="tiny-label">已停用</p>
+    <h2>{{ stats.disabled_users }}</h2>
+  </article>
+  <article class="panel admin-stat">
+    <p class="tiny-label">笔记总数</p>
+    <h2>{{ stats.total_entries }}</h2>
+  </article>
+</section>
+
+<section class="panel admin-table-wrap">
+  <div class="panel-head">
+    <h2>用户管理</h2>
+  </div>
+  <div class="admin-table-scroll">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>用户名</th>
+          <th>角色</th>
+          <th>状态</th>
+          <th>注册时间</th>
+          <th>笔记数</th>
+          <th>锁定剩余</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+          <tr>
+            <td>{{ user.username }}</td>
+            <td>
+              {% if user.is_admin %}
+                <span class="admin-badge role-admin">管理员</span>
+              {% else %}
+                <span class="admin-badge">普通用户</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if user.is_active %}
+                <span class="admin-badge status-on">启用</span>
+              {% else %}
+                <span class="admin-badge status-off">停用</span>
+              {% endif %}
+            </td>
+            <td>{{ user.created_at }}</td>
+            <td>{{ user.entries_count }}</td>
+            <td>
+              {% if user.lock_remaining > 0 %}
+                {{ user.lock_remaining }} 秒
+              {% else %}
+                -
+              {% endif %}
+            </td>
+            <td>
+              {% if user.id == current_admin_id %}
+                <span class="admin-self">当前账号</span>
+              {% elif user.is_admin %}
+                <span class="admin-self">管理员账号</span>
+              {% else %}
+                <div class="admin-actions">
+                  <form method="post" action="{{ url_for('admin_toggle_user_active', user_id=user.id) }}">
+                    <button type="submit" class="{% if user.is_active %}danger-btn{% else %}ghost-btn{% endif %}">
+                      {% if user.is_active %}停用{% else %}启用{% endif %}
+                    </button>
+                  </form>
+                  <form method="post" action="{{ url_for('admin_unlock_user', user_id=user.id) }}">
+                    <button type="submit" class="ghost-btn">解锁</button>
+                  </form>
+                  <form method="post" action="{{ url_for('admin_reset_password', user_id=user.id) }}" onsubmit="return confirm('确认重置该用户密码？');">
+                    <button type="submit">重置密码</button>
+                  </form>
+                </div>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
